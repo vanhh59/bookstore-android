@@ -1,16 +1,9 @@
-import Product from "../models/productModel.js";
-import formidable from "formidable";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import Product from "../models/productModel.js";
 
-const addProduct = asyncHandler((req, res) => {
-  const form = formidable({ multiples: true });
-
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      return res.status(400).json({ error: "Form parsing error" });
-    }
-
-    const { name, description, price, category, quantity, brand } = fields;
+const addProduct = asyncHandler(async (req, res) => {
+  try {
+    const { name, description, price, category, quantity, brand } = req.fields;
 
     // Validation
     switch (true) {
@@ -28,12 +21,14 @@ const addProduct = asyncHandler((req, res) => {
         return res.json({ error: "Quantity is required" });
     }
 
-    const product = new Product({ ...fields });
+    const product = new Product({ ...req.fields });
     await product.save();
     res.json(product);
-  });
+  } catch (error) {
+    console.error(error);
+    res.status(400).json(error.message);
+  }
 });
-
 
 const updateProductDetails = asyncHandler(async (req, res) => {
   try {
