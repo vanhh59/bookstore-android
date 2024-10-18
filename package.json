@@ -1,5 +1,5 @@
 {
-  "name": "vpack-ecomerce",
+  "name": "bookstore-backend",
   "version": "1.0.0",
   "description": "vipack backend",
   "main": "index.js",
