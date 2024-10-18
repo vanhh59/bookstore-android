@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/e3eb973f-4b51-4635-893a-c10d42a58583/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/vipack1",
+    "appService.deploySubpath": "backend"
+}

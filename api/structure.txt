@@ -1,0 +1,10 @@
+bookstore-api/
+│
+├── models/
+│   └── Book.js
+├── routes/
+│   └── bookRoutes.js
+├── .env
+├── server.js
+├── package.json
+└── README.md
