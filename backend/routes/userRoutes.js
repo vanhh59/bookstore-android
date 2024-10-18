@@ -19,14 +19,14 @@ const router = express.Router();
  * @openapi
  * '/api/users/register':
  *  post:
- *     tags:
- *     - Auth
- *     summary: Register a new user
- *     requestBody:
+ *    tags:
+ *      - Auth
+ *    summary: Register a new user
+ *    requestBody:
  *      required: true
  *      content:
  *        application/json:
- *           schema:
+ *          schema:
  *            type: object
  *            required:
  *              - username
@@ -35,16 +35,33 @@ const router = express.Router();
  *            properties:
  *              username:
  *                type: string
- *                default: guest
+ *                example: guest
  *              email:
  *                type: string
- *                default: guest@mail.com
+ *                format: email
+ *                example: guest@mail.com
  *              password:
  *                type: string
- *                default: vipack
- *     responses:
+ *                format: password
+ *                example: vipack
+ *    responses:
  *      201:
  *        description: User registered successfully
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                _id:
+ *                  type: string
+ *                username:
+ *                  type: string
+ *                email:
+ *                  type: string
+ *                  format: email
+ *                message:
+ *                  type: string
+ *                  example: User registered successfully
  *      409:
  *        description: Conflict - User already exists
  *      500:
@@ -57,7 +74,7 @@ router.post("/register", registerUser);
  * '/api/users/auth':
  *  post:
  *    tags:
- *     - Auth
+ *      - Auth
  *    summary: Login a user
  *    description: Allows a user to login by providing email and password
  *    requestBody:
@@ -95,6 +112,9 @@ router.post("/register", registerUser);
  *                  format: email
  *                isAdmin:
  *                  type: boolean
+ *                message:
+ *                  type: string
+ *                  example: Login successful
  *      401:
  *        description: Invalid email or password
  *      404:
@@ -103,6 +123,7 @@ router.post("/register", registerUser);
  *        description: Server error
  */
 router.post("/auth", loginUser);
+
 
 /**
  * @openapi
