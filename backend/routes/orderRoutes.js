@@ -157,7 +157,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 router
   .route("/")
   .post(authenticate, createOrder)
-  .get(authenticate, authorizeAdmin, getAllOrders);
+  .get(authenticate, getAllOrders);
 
 /**
  * @swagger
@@ -311,6 +311,6 @@ router.route("/:id/pay").put(authenticate, markOrderAsPaid);
  */
 router
   .route("/:id/deliver")
-  .put(authenticate, authorizeAdmin, markOrderAsDelivered);
+  .put(authenticate, markOrderAsDelivered);
 
 export default router;

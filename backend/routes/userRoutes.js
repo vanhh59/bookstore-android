@@ -39,11 +39,11 @@ const router = express.Router();
  *              email:
  *                type: string
  *                format: email
- *                example: guest@mail.com
+ *                example: admin@mail.com
  *              password:
  *                type: string
  *                format: password
- *                example: vipack
+ *                example: book
  *    responses:
  *      201:
  *        description: User registered successfully
@@ -94,7 +94,7 @@ router.post("/register", registerUser);
  *              password:
  *                type: string
  *                format: password
- *                example: vipack
+ *                example: book
  *    responses:
  *      200:
  *        description: Successful login
