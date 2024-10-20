@@ -1,5 +1,6 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
+import User from "../models/userModel.js";
 
 const addProduct = asyncHandler(async (req, res) => {
   try {
@@ -78,7 +79,9 @@ const removeProduct = asyncHandler(async (req, res) => {
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
     const pageSize = 6;
+    const page = Number(req.query.page) || 1; // Get current page from query params
 
+    // Construct the search keyword if present
     const keyword = req.query.keyword
       ? {
         name: {
@@ -88,20 +91,33 @@ const fetchProducts = asyncHandler(async (req, res) => {
       }
       : {};
 
+    // Get the total count of documents matching the keyword
     const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword }).limit(pageSize);
 
+    // Fetch products with pagination
+    const products = await Product.find({ ...keyword })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1)); // Skip the previous pages
+
+    // Log the data fetched
+    console.log("Search Keyword:", req.query.keyword);
+    console.log("Total Count of Products:", count);
+    console.log("Fetched Products:", products);
+
+    // Return the results
     res.json({
       products,
-      page: 1,
+      page,
       pages: Math.ceil(count / pageSize),
-      hasMore: false,
+      hasMore: page * pageSize < count, // Check if more products exist
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching products:", error);
     res.status(500).json({ error: "Server Error" });
   }
-});  // hàm này trả về một danh sách sản phẩm dựa trên từ khóa tìm kiếm và số lượng sản phẩm trên mỗi trang
+});
+
+
 
 const fetchProductById = asyncHandler(async (req, res) => {
   try {
@@ -133,45 +149,60 @@ const fetchAllProducts = asyncHandler(async (req, res) => {
 
 const addProductReview = asyncHandler(async (req, res) => {
   try {
-    const { rating, comment } = req.body;
-    const product = await Product.findById(req.params.id);
+    const { rating, comment, user, username } = req.body; // Accept user ID and username from the body
+    const product = await Product.findById(req.params.id).lean(); // Use .lean() for better performance
 
-    if (product) {
-      const alreadyReviewed = product.reviews.find(
-        (r) => r.user.toString() === req.user._id.toString()
-      );
-
-      if (alreadyReviewed) {
-        res.status(400);
-        throw new Error("Product already reviewed");
-      }
-
-      const review = {
-        name: req.user.username,
-        rating: Number(rating),
-        comment,
-        user: req.user._id,
-      };
-
-      product.reviews.push(review);
-
-      product.numReviews = product.reviews.length;
-
-      product.rating =
-        product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-        product.reviews.length;
-
-      await product.save();
-      res.status(201).json({ message: "Review added" });
-    } else {
-      res.status(404);
-      throw new Error("Product not found");
+    // Validate if the user exists
+    const foundUser = await User.findById(user);
+    if (!foundUser) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    // Check if the product exists
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Check if the user has already reviewed the product
+    const alreadyReviewed = product.reviews.find(
+      (r) => r.user.toString() === foundUser._id.toString() // Check against foundUser ID
+    );
+
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: "Product already reviewed" });
+    }
+
+    // Create the review object
+    const review = {
+      name: username,
+      rating: Number(rating),
+      comment,
+      user: foundUser._id, // Store the user's ID directly
+    };
+
+    // Push the review into the product's reviews array
+    product.reviews.push(review);
+
+    // Update the number of reviews and the overall rating
+    product.numReviews = product.reviews.length;
+
+    // Calculate the new rating based on all reviews
+    product.rating =
+      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+      product.reviews.length;
+
+    // Save the updated product
+    await Product.findByIdAndUpdate(req.params.id, product, { new: true });
+
+    // Respond with a success message
+    res.status(201).json({ message: "Review added" });
   } catch (error) {
     console.error(error);
-    res.status(400).json(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
+
+
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
