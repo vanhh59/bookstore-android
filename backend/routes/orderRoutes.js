@@ -11,6 +11,7 @@ import {
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
+  getCartItems,
 } from "../controllers/orderController.js";
 
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
@@ -43,33 +44,45 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *               shippingAddress:
  *                 type: object
  *                 properties:
+ *                   name:
+ *                     type: string
+ *                     description: "Name of the recipient"
  *                   address:
  *                     type: string
+ *                     description: "Shipping address"
  *                   city:
  *                     type: string
+ *                     description: "City of the shipping address"
  *                   postalCode:
  *                     type: string
+ *                     description: "Postal code of the shipping address"
  *                   country:
  *                     type: string
+ *                     description: "Country of the shipping address"
+ *                   phoneNumber:
+ *                     type: string
+ *                     description: "Phone number of the recipient"
  *               paymentMethod:
  *                 type: string
+ *                 description: "Method of payment"
+ *               paymentBill:
+ *                 type: string
+ *                 description: "ID of the payment bill"
  *             example:
- *               orderItems: [
- *                 {
- *                   _id: "product_id_1",
- *                   qty: 20
- *                 },
- *                 {
- *                   _id: "product_id_2",
- *                   qty: 10
- *                 }
- *               ]
- *               shippingAddress:
- *                 address: "120 Long Thanh My HCM THU DUC"
- *                 city: "Ho Chi Minh"
- *                 postalCode: "12345"
- *                 country: "USA"
- *               paymentMethod: "Credit Card"
+ *               orderItems: 
+ *                 - _id: "67127cb5f90d16421311e78b"
+ *                   qty: 2
+ *                 - _id: "67147721c8d069352559be03"
+ *                   qty: 1
+ *               shippingAddress: 
+ *                 name: "Viet Anh"
+ *                 address: "120 La Xuan Oai Thu Duc"
+ *                 city: "HCM"
+ *                 postalCode: "70000"
+ *                 country: "VN"
+ *                 phoneNumber: "0123456789"
+ *               paymentMethod: "Momo"
+ *               paymentBill: "671223827478771599feaead"
  *     responses:
  *       201:
  *         description: Order created successfully
@@ -80,6 +93,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *       500:
  *         description: Internal server error
  */
+
 /**
  * @swagger
  * /api/orders:
@@ -87,8 +101,6 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *     summary: Retrieve all orders
  *     description: Fetch all orders from the system. Only admins can access this route.
  *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully retrieved all orders
@@ -312,5 +324,12 @@ router.route("/:id/pay").put(authenticate, markOrderAsPaid);
 router
   .route("/:id/deliver")
   .put(authenticate, markOrderAsDelivered);
+
+// Router get OrderItems
+router
+  .route("/cart-items")
+  .get(authenticate, getCartItems);
+
+
 
 export default router;

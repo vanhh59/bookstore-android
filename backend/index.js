@@ -14,6 +14,7 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js"; // Import blog routes
 import paymentBillRoutes from "./routes/paymentBillRoutes.js";
+import orderItemRoutes from "./routes/orderItemRoutes.js";
 
 dotenv.config();
 const port = process.env.PORT || 10000;
@@ -34,7 +35,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/blogs", blogRoutes); // Use blog routes
 app.use("/api/payment-bills", paymentBillRoutes); // Payment bill routes
-
+app.use("/api/order-items", orderItemRoutes);
 app.get("/api/config/paypal", (req, res) => {
   res.send({ clientId: process.env.PAYPAL_CLIENT_ID });
 });

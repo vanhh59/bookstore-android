@@ -1,6 +1,7 @@
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import PaymentBill from "../models/paymentBillModel.js";
+import OrderItems from "../models/orderItemModel.js"; // Add this import
 
 // Utility Function
 function calcPrices(orderItems) {
@@ -32,49 +33,55 @@ const createOrder = async (req, res) => {
     const { orderItems, shippingAddress, paymentMethod, paymentBill } = req.body;
 
     // Check for empty order items
-    if (orderItems && orderItems.length === 0) {
-      res.status(400);
-      throw new Error("No order items");
+    if (!orderItems || orderItems.length === 0) {
+      return res.status(400).json({ message: "No order items provided" });
     }
 
     // Check if the paymentBill exists
     const foundPaymentBill = await PaymentBill.findById(paymentBill);
-    // console.log("Found Payment Bill:", foundPaymentBill); // Debugging log
-
     if (!foundPaymentBill) {
       return res.status(404).json({ message: "Payment Bill not found" });
     }
 
     // Fetch products from the database
-    const itemsFromDB = await Product.find({
-      _id: { $in: orderItems.map((x) => x._id) },
-    });
+    const productIds = orderItems.map(item => item._id);
+    const itemsFromDB = await Product.find({ _id: { $in: productIds } });
 
-    // Validate and build order items with correct prices
-    const dbOrderItems = orderItems.map((itemFromClient) => {
+    if (itemsFromDB.length !== productIds.length) {
+      return res.status(404).json({ message: "One or more products not found" });
+    }
+
+    // Create OrderItems in the database and map the product references
+    const orderItemsPromises = orderItems.map(async (itemFromClient) => {
       const matchingItemFromDB = itemsFromDB.find(
         (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
       );
 
       if (!matchingItemFromDB) {
-        res.status(404);
         throw new Error(`Product not found: ${itemFromClient._id}`);
       }
 
-      return {
-        ...itemFromClient,
-        product: itemFromClient._id,
+      // Create a new order item and save it
+      const newOrderItem = new OrderItems({
+        name: matchingItemFromDB.name,
+        qty: itemFromClient.qty,
+        image: matchingItemFromDB.image,
         price: matchingItemFromDB.price,
-        _id: undefined,
-      };
+        product: matchingItemFromDB._id,
+      });
+
+      return await newOrderItem.save();
     });
 
-    const { itemsPrice, taxPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItems);
+    const savedOrderItems = await Promise.all(orderItemsPromises);
 
+    const { itemsPrice, taxPrice, shippingPrice, totalPrice } = calcPrices(savedOrderItems);
+
+    // Create and save the order
     const order = new Order({
-      orderItems: dbOrderItems,
       user: req.user._id,
       paymentBill: foundPaymentBill._id,
+      orderItems: savedOrderItems.map(item => item._id), // Store references to OrderItems
       shippingAddress,
       paymentMethod,
       itemsPrice,
@@ -84,9 +91,10 @@ const createOrder = async (req, res) => {
     });
 
     const createdOrder = await order.save();
+
     res.status(201).json(createdOrder);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -215,6 +223,24 @@ const markOrderAsDelivered = async (req, res) => {
   }
 };
 
+const getCartItems = async (req, res) => {
+  try {
+    // Fetch all orders and only select orderItems
+    const orders = await Order.find({}).select('orderItems').populate('orderItems.product', 'name price image'); // Populate product details
+
+    // Extract orderItems from each order
+    const allOrderItems = orders.map(order => order.orderItems).flat();
+
+    res.json({
+      success: true,
+      data: allOrderItems,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 export {
   createOrder,
   getAllOrders,
@@ -225,4 +251,6 @@ export {
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
+
+  getCartItems
 };
