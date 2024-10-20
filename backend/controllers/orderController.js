@@ -2,6 +2,7 @@ import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 import PaymentBill from "../models/paymentBillModel.js";
 import OrderItems from "../models/orderItemModel.js"; // Add this import
+import User from "../models/userModel.js";
 
 // Utility Function
 function calcPrices(orderItems) {
@@ -30,7 +31,7 @@ function calcPrices(orderItems) {
 
 const createOrder = async (req, res) => {
   try {
-    const { orderItems, shippingAddress, paymentMethod, paymentBill } = req.body;
+    const { user, orderItems, shippingAddress, paymentMethod, paymentBill } = req.body;
 
     // Check for empty order items
     if (!orderItems || orderItems.length === 0) {
@@ -41,6 +42,12 @@ const createOrder = async (req, res) => {
     const foundPaymentBill = await PaymentBill.findById(paymentBill);
     if (!foundPaymentBill) {
       return res.status(404).json({ message: "Payment Bill not found" });
+    }
+
+    // Fetch the user from the database
+    const foundUser = await User.findById(user);
+    if (!foundUser) {
+      return res.status(404).json({ message: "User not found" });
     }
 
     // Fetch products from the database
@@ -77,9 +84,9 @@ const createOrder = async (req, res) => {
 
     const { itemsPrice, taxPrice, shippingPrice, totalPrice } = calcPrices(savedOrderItems);
 
-    // Create and save the order
+    // Create and save the order with user ID
     const order = new Order({
-      user: req.user._id,
+      user: foundUser._id, // Store only the user ID here
       paymentBill: foundPaymentBill._id,
       orderItems: savedOrderItems.map(item => item._id), // Store references to OrderItems
       shippingAddress,
@@ -109,12 +116,30 @@ const getAllOrders = async (req, res) => {
 
 const getUserOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user._id });
+    // Get user ID from URL parameters
+    const userId = req.params.userId; // Extract userId from req.params
+
+    // Validate if the user exists
+    const foundUser = await User.findById(userId);
+    if (!foundUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Fetch the orders for the found user
+    const orders = await Order.find({ user: foundUser._id }); // Use the found user's ID
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this user" });
+    }
+
+    // Return the orders
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 const countTotalOrders = async (req, res) => {
   try {

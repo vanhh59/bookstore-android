@@ -168,8 +168,8 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
 router
   .route("/")
-  .post(authenticate, createOrder)
-  .get(authenticate, getAllOrders);
+  .post(createOrder)
+  .get(getAllOrders);
 
 /**
  * @swagger
@@ -186,7 +186,8 @@ router
  *       500:
  *         description: Internal server error
  */
-router.route("/mine").get(authenticate, getUserOrders);
+//router.route("/mine").get(authenticate, getUserOrders);
+router.post('/orders/:userId', getUserOrders);
 
 /**
  * @swagger

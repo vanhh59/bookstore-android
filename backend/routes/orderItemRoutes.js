@@ -126,7 +126,7 @@ import { authenticate } from "../middlewares/authMiddleware.js";
 
 router
     .route("/")
-    .post(authenticate, addOrderItem)
-    .get(authenticate, getOrderItem);
+    .post(addOrderItem)
+    .get(getOrderItem);
 
 export default router;
