@@ -10,7 +10,7 @@ const generateToken = (res, userId) => {
   // với việc lưu trữ trong localStorage, nếu có một lỗ hổng XSS, attacker có thể lấy được token và thực hiện các hành vi độc hại
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== "development",
+    secure: process.env.NODE_ENV !== "development" ? "Lax" : "None",
     sameSite: "strict",
     maxAge: 30 * 24 * 60 * 60 * 1000,
   });

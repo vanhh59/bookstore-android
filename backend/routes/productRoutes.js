@@ -14,6 +14,7 @@ import {
   fetchTopProducts,
   fetchNewProducts,
   filterProducts,
+  filterProductsByName
 } from "../controllers/productController.js";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 import checkId from "../middlewares/checkId.js";
@@ -221,7 +222,8 @@ router.route("/allproducts").get(fetchAllProducts);
  *       500:
  *         description: Server error
  */
-router.route("/:id/reviews").post(checkId, addProductReview);
+//router.route("/:id/reviews").post(checkId, addProductReview);
+router.route("/:id/reviews").post(authenticate, checkId, addProductReview);
 
 /**
  * @openapi
@@ -370,5 +372,7 @@ router
  *         description: Server error
  */
 router.route("/filtered-products").post(filterProducts);
+
+router.route("/filtered-products-name").post(filterProductsByName);
 
 export default router;
