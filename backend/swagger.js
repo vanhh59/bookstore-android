@@ -9,17 +9,17 @@ const options = {
             title: 'API',
             description: "API endpoints for a mini blog services documented on swagger",
             contact: {
-                name: "VIPACK",
+                name: "Bookstore API",
                 email: "vanhhh59@gmail.com",
-                url: "https://github.com/vanhh59/vpack-ecomerce.git"
+                url: "https://github.com/vanhh59/bookstore-api-nodejs"
             },
             version: '1.0.0',
         },
         servers: [
-            // {
-            //     url: "https://bookstore-api-nodejs.onrender.com",
-            //     description: "Live server"
-            // },
+            {
+                url: "https://bookstore-api-nodejs.onrender.com",
+                description: "Live server"
+            },
             {
                 url: "http://localhost:10000/",
                 description: "Local server"
