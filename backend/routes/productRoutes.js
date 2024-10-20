@@ -74,7 +74,7 @@ import checkId from "../middlewares/checkId.js";
  *       500:
  *         description: Internal Server Error - Failed to create product
  */
-router.route("/").post(authenticate, authorizeAdmin, formidable(), addProduct);
+router.route("/").post(formidable(), addProduct);
 
 /**
  * @openapi
@@ -223,7 +223,7 @@ router.route("/allproducts").get(fetchAllProducts);
  *         description: Server error
  */
 //router.route("/:id/reviews").post(checkId, addProductReview);
-router.route("/:id/reviews").post(authenticate, checkId, addProductReview);
+router.route("/:id/reviews").post(checkId, addProductReview);
 
 /**
  * @openapi
