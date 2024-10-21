@@ -70,17 +70,16 @@ const createOrder = async (req, res) => {
         throw new Error(`Product not found: ${itemFromClient.id}`);
       }
 
-      // Create a new order item and save it
-      const newOrderItem = new OrderItems({
-        user: foundUser._id,
-        name: matchingProductFromDB.name,
-        qty: productFromClient.qty,
-        image: matchingProductFromDB.image,
-        price: matchingProductFromDB.price,
-        product: matchingProductFromDB._id,
-      });
+      // Get order item base on user and product
+      const orderItem = await OrderItems.findOne({ user: foundUser._id, product: matchingProductFromDB._id });
 
-      return await newOrderItem.save();
+      if (orderItem) {
+        // Update the quantity of the existing order item
+        orderItem.qty = productFromClient.qty;
+      }
+
+      return await orderItem.save();
+
     });
 
     const savedOrderItems = await Promise.all(orderItemsPromises);
