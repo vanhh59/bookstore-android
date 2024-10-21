@@ -30,6 +30,9 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *           schema:
  *             type: object
  *             properties:
+ *               user:
+ *                 type: string
+ *                 description: "User ID"
  *               orderItems:
  *                 type: array
  *                 items:
@@ -69,6 +72,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *                 type: string
  *                 description: "ID of the payment bill"
  *             example:
+ *               user: "671226027478771599feaedf"
  *               orderItems: 
  *                 - _id: "67127cb5f90d16421311e78b"
  *                   qty: 2
@@ -173,21 +177,102 @@ router
 
 /**
  * @swagger
- * /api/orders/mine:
+ * /api/orders/order-user/{id}:
  *   get:
  *     summary: Get current user's orders
  *     description: Fetches all orders for the authenticated user.
  *     tags: [Orders]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the user whose orders are being fetched
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: List of user's orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                     description: "Unique identifier for the order"
+ *                   user:
+ *                     type: string
+ *                     description: "ID of the user who placed the order"
+ *                   paymentBill:
+ *                     type: string
+ *                     description: "ID of the associated payment bill"
+ *                   orderItems:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                       description: "Array of product IDs in the order"
+ *                   shippingAddress:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         description: "Name of the recipient"
+ *                       address:
+ *                         type: string
+ *                         description: "Shipping address"
+ *                       city:
+ *                         type: string
+ *                         description: "City of the shipping address"
+ *                       postalCode:
+ *                         type: string
+ *                         description: "Postal code of the shipping address"
+ *                       country:
+ *                         type: string
+ *                         description: "Country of the shipping address"
+ *                       phoneNumber:
+ *                         type: string
+ *                         description: "Phone number of the recipient"
+ *                   paymentMethod:
+ *                     type: string
+ *                     description: "Method of payment used for the order"
+ *                   itemsPrice:
+ *                     type: number
+ *                     description: "Total price of the items"
+ *                   taxPrice:
+ *                     type: number
+ *                     description: "Total tax applied"
+ *                   shippingPrice:
+ *                     type: number
+ *                     description: "Shipping cost"
+ *                   totalPrice:
+ *                     type: number
+ *                     description: "Total order price"
+ *                   isPaid:
+ *                     type: boolean
+ *                     description: "Payment status of the order"
+ *                   isDelivered:
+ *                     type: boolean
+ *                     description: "Delivery status of the order"
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: "Order creation date"
+ *                   updatedAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: "Order update date"
+ *                   __v:
+ *                     type: integer
+ *                     description: "Version key for the document"
  *       401:
  *         description: Unauthorized access
  *       500:
  *         description: Internal server error
  */
-//router.route("/mine").get(authenticate, getUserOrders);
-router.get('/order-user/:id', getUserOrders);
+router.route('/order-user/:id')
+  .get(getUserOrders);
 
 /**
  * @swagger

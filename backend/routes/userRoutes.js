@@ -145,7 +145,7 @@ router.post("/logout", logoutCurrentUser);
  * '/api/users':
  *  get:
  *     tags:
- *     - Admin
+ *     - User
  *     summary: Get all users (admin access required)
  *     security:
  *      - bearerAuth: []
@@ -222,7 +222,7 @@ router.route("/profile")
  * '/api/users/{id}':
  *  get:
  *     tags:
- *     - Admin
+ *     - User
  *     summary: Get user by ID (admin access required)
  *     security:
  *      - bearerAuth: []
@@ -244,7 +244,7 @@ router.route("/profile")
  *        description: Server error
  *  put:
  *     tags:
- *     - Admin
+ *     - User
  *     summary: Update user by ID (admin access required)
  *     security:
  *      - bearerAuth: []
@@ -283,7 +283,7 @@ router.route("/profile")
  *        description: Server error
  *  delete:
  *     tags:
- *     - Admin
+ *     - User
  *     summary: Delete user by ID (admin access required)
  *     security:
  *      - bearerAuth: []

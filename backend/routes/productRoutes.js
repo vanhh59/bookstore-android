@@ -13,8 +13,7 @@ import {
   addProductReview,
   fetchTopProducts,
   fetchNewProducts,
-  filterProducts,
-  filterProductsByName
+  filterProducts
 } from "../controllers/productController.js";
 import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 import checkId from "../middlewares/checkId.js";
@@ -39,15 +38,15 @@ import checkId from "../middlewares/checkId.js";
  *               name:
  *                 type: string
  *                 description: Name of the product
- *                 example: test3
+ *                 example: Name String
  *               brand:
  *                 type: string
  *                 description: Brand of the product
- *                 example: vendo
+ *                 example: Self-help
  *               description:
  *                 type: string
  *                 description: Description of the product
- *                 example: test1
+ *                 example: Description String
  *               price:
  *                 type: number
  *                 description: Price of the product
@@ -55,14 +54,14 @@ import checkId from "../middlewares/checkId.js";
  *               category:
  *                 type: string
  *                 description: Category ID of the product
- *                 example: 670172c4a884b2a83eb03d30
+ *                 example: Category ID
  *               quantity:
  *                 type: number
  *                 description: Quantity of the product in stock
  *                 example: 18
  *               image:
  *                 type: string
- *                 example: Url
+ *                 example: Url link of the image
  *                 description: Image file for the product
  *     responses:
  *       201:
@@ -84,30 +83,12 @@ router.route("/").post(formidable(), addProduct);
  *       - Products
  *     summary: Fetch all products with optional filters
  *     parameters:
- *       - name: category
+ *       - name: keyword
  *         in: query
- *         description: Filter products by category ID
+ *         description: Filter products by name (search keyword)
  *         required: false
  *         schema:
  *           type: string
- *       - name: brand
- *         in: query
- *         description: Filter products by brand name
- *         required: false
- *         schema:
- *           type: string
- *       - name: minPrice
- *         in: query
- *         description: Minimum price filter
- *         required: false
- *         schema:
- *           type: number
- *       - name: maxPrice
- *         in: query
- *         description: Maximum price filter
- *         required: false
- *         schema:
- *           type: number
  *     responses:
  *       200:
  *         description: Products retrieved successfully
@@ -189,8 +170,6 @@ router.route("/allproducts").get(fetchAllProducts);
  *     tags:
  *       - Products
  *     summary: Add a review for a product
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - name: id
  *         in: path
@@ -205,12 +184,15 @@ router.route("/allproducts").get(fetchAllProducts);
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               user:
  *                 type: string
- *                 description: The name of the user submitting the review
+ *                 example: 671226027478771599feaedf
+ *                 description: The unique identifier of the user submitting the review
  *               rating:
  *                 type: number
  *                 description: Rating of the product (1 to 5)
+ *                 minimum: 1
+ *                 maximum: 5
  *               comment:
  *                 type: string
  *                 description: Review comment
@@ -222,7 +204,6 @@ router.route("/allproducts").get(fetchAllProducts);
  *       500:
  *         description: Server error
  */
-//router.route("/:id/reviews").post(checkId, addProductReview);
 router.route("/:id/reviews").post(checkId, addProductReview);
 
 /**
@@ -260,7 +241,7 @@ router.get("/new", fetchNewProducts);
  * /api/products/{id}:
  *   get:
  *     tags:
- *       - Admin
+ *       - Products
  *     summary: Get a product by ID (admin access required)
  *     parameters:
  *       - name: id
@@ -278,7 +259,7 @@ router.get("/new", fetchNewProducts);
  *         description: Server error
  *   put:
  *     tags:
- *       - Admin
+ *       - Products
  *     summary: Update a product by ID (admin access required)
  *     security:
  *       - bearerAuth: []
@@ -321,7 +302,7 @@ router.get("/new", fetchNewProducts);
  *         description: Server error
  *   delete:
  *     tags:
- *       - Admin
+ *       - Products
  *     summary: Delete a product by ID (admin access required)
  *     security:
  *       - bearerAuth: []
@@ -372,7 +353,5 @@ router
  *         description: Server error
  */
 router.route("/filtered-products").post(filterProducts);
-
-router.route("/filtered-products-name").post(filterProductsByName);
 
 export default router;
