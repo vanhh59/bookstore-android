@@ -51,7 +51,9 @@ const createOrder = async (req, res) => {
     }
 
     // Fetch products from the database
-    const productIds = orderItems.map(item => item._id);
+    const productIds = orderItems.map(item => item.id);
+    console.log(productIds);
+
     const itemsFromDB = await Product.find({ _id: { $in: productIds } });
 
     if (itemsFromDB.length !== productIds.length) {
@@ -61,11 +63,11 @@ const createOrder = async (req, res) => {
     // Create OrderItems in the database and map the product references
     const orderItemsPromises = orderItems.map(async (itemFromClient) => {
       const matchingItemFromDB = itemsFromDB.find(
-        (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
+        (itemFromDB) => itemFromDB._id.toString() == itemFromClient.id
       );
 
       if (!matchingItemFromDB) {
-        throw new Error(`Product not found: ${itemFromClient._id}`);
+        throw new Error(`Product not found: ${itemFromClient.id}`);
       }
 
       // Create a new order item and save it
