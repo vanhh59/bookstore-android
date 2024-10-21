@@ -1,10 +1,17 @@
 import Product from "../models/productModel.js";
 import OrderItems from "../models/orderItemModel.js";
 import mongoose from "mongoose";
+import User from "../models/userModel.js";
 
 const addOrderItem = async (req, res) => {
     try {
-        const { product, qty } = req.body;
+        const { user, product, qty } = req.body;
+
+        // Fetch the user from the database
+        const foundUser = await User.findById(user);
+        if (!foundUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
         // Validate product ID format before querying
         if (!mongoose.Types.ObjectId.isValid(product)) {
@@ -19,6 +26,7 @@ const addOrderItem = async (req, res) => {
 
         // Create a new order item
         const orderItem = new OrderItems({
+            user: foundUser._id, // Reference the user's _id
             name: productExists.name, // Use product's name from the database
             qty,
             image: productExists.image, // Use product's image from the database
@@ -44,12 +52,12 @@ const addOrderItem = async (req, res) => {
 
 const getOrderItem = async (req, res) => {
     try {
-        // Fetch order items with specific fields and product ID
+        // Fetch order items with specific fields and populated product details
         const orderItems = await OrderItems.find()
-            .select("name qty image price product")
-            .populate("product", "_id"); // Only populate the product's _id field
+            .select("name qty image price product user") // Include the user field explicitly
+            .populate("product", "_id"); // Populate the product's _id field
 
-        // Respond with the filtered order items
+        // Respond with the filtered order items including user ID
         res.status(200).json({
             success: true,
             data: orderItems,
@@ -63,5 +71,34 @@ const getOrderItem = async (req, res) => {
     }
 };
 
+const getOrderItemByUserID = async (req, res) => {
+    try {
+        // Extract the user ID from the URL parameters
+        const user = req.params.id;
 
-export { addOrderItem, getOrderItem };
+        // Fetch the user from the database
+        const foundUser = await User.findById(user);
+        if (!foundUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Fetch order items with specific fields and populated product details
+        const orderItems = await OrderItems.find({ user: foundUser._id })
+            .select("name qty image price product user") // Include the user field explicitly
+            .populate("product", "_id"); // Populate the product's _id field
+
+        // Respond with the filtered order items including user ID
+        res.status(200).json({
+            success: true,
+            data: orderItems,
+        });
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+export { addOrderItem, getOrderItem, getOrderItemByUserID };

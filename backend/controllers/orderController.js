@@ -54,29 +54,30 @@ const createOrder = async (req, res) => {
     const productIds = orderItems.map(item => item.id);
     console.log(productIds);
 
-    const itemsFromDB = await Product.find({ _id: { $in: productIds } });
+    const productsFromDB = await Product.find({ _id: { $in: productIds } });
 
-    if (itemsFromDB.length !== productIds.length) {
+    if (productsFromDB.length !== productIds.length) {
       return res.status(404).json({ message: "One or more products not found" });
     }
 
     // Create OrderItems in the database and map the product references
-    const orderItemsPromises = orderItems.map(async (itemFromClient) => {
-      const matchingItemFromDB = itemsFromDB.find(
-        (itemFromDB) => itemFromDB._id.toString() == itemFromClient.id
+    const orderItemsPromises = orderItems.map(async (productFromClient) => {
+      const matchingProductFromDB = productsFromDB.find(
+        (productFromDB) => productFromDB._id.toString() == productFromClient.id
       );
 
-      if (!matchingItemFromDB) {
+      if (!matchingProductFromDB) {
         throw new Error(`Product not found: ${itemFromClient.id}`);
       }
 
       // Create a new order item and save it
       const newOrderItem = new OrderItems({
-        name: matchingItemFromDB.name,
-        qty: itemFromClient.qty,
-        image: matchingItemFromDB.image,
-        price: matchingItemFromDB.price,
-        product: matchingItemFromDB._id,
+        user: foundUser._id,
+        name: matchingProductFromDB.name,
+        qty: productFromClient.qty,
+        image: matchingProductFromDB.image,
+        price: matchingProductFromDB.price,
+        product: matchingProductFromDB._id,
       });
 
       return await newOrderItem.save();
@@ -119,10 +120,10 @@ const getAllOrders = async (req, res) => {
 const getUserOrders = async (req, res) => {
   try {
     // Get user ID from URL parameters
-    const userId = req.params.userId; // Extract userId from req.params
+    const user = req.params._id; // Extract userId from req.params
 
     // Validate if the user exists
-    const foundUser = await User.findById(userId);
+    const foundUser = await User.findById(user);
     if (!foundUser) {
       return res.status(404).json({ message: "User not found" });
     }

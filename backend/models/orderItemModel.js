@@ -1,8 +1,14 @@
 import mongoose from "mongoose";
 const { ObjectId } = mongoose.Schema;
 
+
 const orderItemSchema = mongoose.Schema(
     {
+        user: {
+            type: ObjectId,
+            required: true,
+            ref: "User",
+        },
         name: { type: String, required: true },
         qty: { type: Number, required: true },
         image: { type: String, required: true },

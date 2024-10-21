@@ -4,6 +4,7 @@ const router = express.Router();
 import {
     addOrderItem,
     getOrderItem,
+    getOrderItemByUserID,
 } from "../controllers/orderItemController.js";
 
 import { authenticate } from "../middlewares/authMiddleware.js";
@@ -128,5 +129,8 @@ router
     .route("/")
     .post(addOrderItem)
     .get(getOrderItem);
+router
+    .route("/:id")
+    .get(getOrderItemByUserID);
 
 export default router;
