@@ -120,18 +120,19 @@ const getAllOrders = async (req, res) => {
 const getUserOrders = async (req, res) => {
   try {
     // Get user ID from URL parameters
-    const user = req.params._id; // Extract userId from req.params
+    const user = req.params.id; // Extract userId from req.params
 
     // Validate if the user exists
     const foundUser = await User.findById(user);
     if (!foundUser) {
       return res.status(404).json({ message: "User not found" });
     }
+    //console.log(foundUser);
 
     // Fetch the orders for the found user
     const orders = await Order.find({ user: foundUser._id }); // Use the found user's ID
 
-    if (!orders || orders.length === 0) {
+    if (!orders || orders.length == 0) {
       return res.status(404).json({ message: "No orders found for this user" });
     }
 
@@ -141,7 +142,6 @@ const getUserOrders = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
 
 
 const countTotalOrders = async (req, res) => {

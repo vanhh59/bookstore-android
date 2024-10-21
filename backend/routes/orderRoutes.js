@@ -187,7 +187,7 @@ router
  *         description: Internal server error
  */
 //router.route("/mine").get(authenticate, getUserOrders);
-router.get('/orders/:userId', getUserOrders);
+router.get('/order-user/:id', getUserOrders);
 
 /**
  * @swagger
