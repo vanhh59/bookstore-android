@@ -1,0 +1,21 @@
+const fetchAllProducts = asyncHandler(async (req, res) => {
+  try {
+    const products = await Product.find({})
+      .populate({
+        path: 'category',
+        select: 'name',
+      })
+      .limit(12)
+      .sort({ createdAt: -1 });
+
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(), 
+      category: product.category.name
+    }));
+
+    res.json(formattedProducts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});

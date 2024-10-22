@@ -157,7 +157,7 @@ router.post("/logout", logoutCurrentUser);
  *      500:
  *        description: Server error
  */
-router.get("/", authenticate, authorizeAdmin, getAllUsers);
+router.get("/", getAllUsers);
 
 /**
  * @openapi
@@ -166,8 +166,6 @@ router.get("/", authenticate, authorizeAdmin, getAllUsers);
  *     tags:
  *     - User
  *     summary: Get current user profile
- *     security:
- *      - bearerAuth: []
  *     responses:
  *      200:
  *        description: Successfully retrieved user profile
@@ -177,8 +175,8 @@ router.get("/", authenticate, authorizeAdmin, getAllUsers);
  *        description: Server error
  */
 router
-  .route("/profile")
-  .get(authenticate, getCurrentUserProfile);
+  .route("/profile/:id")
+  .get(getCurrentUserProfile);
 
 /**
 * @openapi
@@ -306,8 +304,8 @@ router.route("/profile")
  */
 router
   .route("/:id")
-  .delete(authenticate, authorizeAdmin, deleteUserById)
-  .get(authenticate, authorizeAdmin, getUserById)
-  .put(authenticate, authorizeAdmin, updateUserById);
+  .delete(deleteUserById)
+  .get(getUserById)
+  .put(updateUserById);
 
 export default router;

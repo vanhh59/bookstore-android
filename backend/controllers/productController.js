@@ -76,50 +76,98 @@ const removeProduct = asyncHandler(async (req, res) => {
   }
 });
 
+// const fetchProducts = asyncHandler(async (req, res) => {
+//   try {
+//     const keyword = req.query.keyword ? req.query.keyword.trim() : '';
+//     const regexQuery = keyword
+//       ? {
+//         name: {
+//           $regex: keyword,
+//           $options: 'i',
+//         },
+//       }
+//       : {};
+//     console.log("Regex Query:", regexQuery);
+//     const products = await Product.find({ ...regexQuery }).populate('category');
+
+//     res.json(products);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Server Error' });
+//   }
+// });
+
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
-    const keyword = req.query.keyword ? req.query.keyword.trim() : '';
-    const regexQuery = keyword
+    const keyword = req.query.keyword
       ? {
-        name: {
-          $regex: keyword,
-          $options: 'i',
-        },
-      }
+          name: {
+            $regex: req.query.keyword.trim(),
+            $options: "i",
+          },
+        }
       : {};
-    console.log("Regex Query:", regexQuery);
-    const products = await Product.find({ ...regexQuery }).populate('category');
 
-    res.json(products);
+    const products = await Product.find({ ...keyword }).populate({
+      path: "category",
+      select: "name",
+    });
+
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(),
+      category: product.category.name,
+    }));
+
+    res.json({
+      products: formattedProducts,
+    });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Server Error' });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
-
 const fetchProductById = asyncHandler(async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (product) {
-      return res.json(product);
-    } else {
-      res.status(404);
-      throw new Error("Product not found");
+    const product = await Product.findById(req.params.id).populate({
+      path: "category",
+      select: "name",
+    });
+
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
     }
+
+    const formattedProduct = {
+      ...product.toObject(),
+      category: product.category.name,
+    };
+
+    res.json({
+      product: formattedProduct,
+    });
   } catch (error) {
     console.error(error);
-    res.status(404).json({ error: "Product not found" });
+    res.status(500).json({ error: "Server Error" });
   }
-}); // hàm này trả về một sản phẩm dựa trên id
+});
 
 const fetchAllProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({})
-      .populate("category")
-      .sort({ createAt: -1 });
+      .populate({
+        path: 'category',
+        select: 'name',
+      })
+      .limit(12)
+      .sort({ createdAt: -1 });
 
-    res.json(products);
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(), 
+      category: product.category.name
+    }));
+
+    res.json(formattedProducts);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server Error" });
@@ -175,8 +223,20 @@ const addProductReview = asyncHandler(async (req, res) => {
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find({}).sort({ rating: -1 }).limit(4);
-    res.json(products);
+    const products = await Product.find({})
+      .populate({
+        path: 'category',
+        select: 'name',
+      })
+      .sort({ rating: -1 })
+      .limit(4);
+    
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(), 
+      category: product.category.name
+    }));
+
+    res.json(formattedProducts);
   } catch (error) {
     console.error(error);
     res.status(400).json(error.message);
