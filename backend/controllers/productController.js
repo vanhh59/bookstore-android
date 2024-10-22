@@ -99,6 +99,7 @@ const removeProduct = asyncHandler(async (req, res) => {
 
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
+    // Extract keyword and category from query parameters
     const keyword = req.query.keyword
       ? {
           name: {
@@ -108,7 +109,12 @@ const fetchProducts = asyncHandler(async (req, res) => {
         }
       : {};
 
-    const products = await Product.find({ ...keyword }).populate({
+    const categoryFilter = req.query.category ? { category: req.query.category } : {};
+
+    // Combine filters
+    const filters = { ...keyword, ...categoryFilter };
+
+    const products = await Product.find(filters).populate({
       path: "category",
       select: "name",
     });
