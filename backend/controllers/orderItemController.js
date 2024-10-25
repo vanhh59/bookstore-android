@@ -101,4 +101,69 @@ const getOrderItemByUserID = async (req, res) => {
     }
 };
 
-export { addOrderItem, getOrderItem, getOrderItemByUserID };
+const deleteOrderItem = async (req, res) => {
+    try {
+        // Extract the order item ID from the URL parameters
+        const orderItem = req.params.id;
+
+        // Validate order item ID format before querying
+        if (!mongoose.Types.ObjectId.isValid(orderItem)) {
+            return res.status(400).json({ message: "Invalid order item ID" });
+        }
+
+        // Find and delete the order item from the database
+        const deletedOrderItem = await OrderItems.findByIdAndDelete(orderItem);
+
+        // Respond with a success message
+        if (deletedOrderItem) {
+            res.status(200).json({
+                success: true,
+                message: "Order item deleted successfully",
+            });
+        } else {
+            res.status(404).json({ message: "Order item not found" });
+        }
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+};
+
+// update order item by quantity
+const updateOrderItem = async (req, res) => {
+    try {
+        // Extract the order item ID from the URL parameters
+        const orderItem = req.params.id;
+        const { qty } = req.body;
+
+        // Validate order item ID format before querying
+        if (!mongoose.Types.ObjectId.isValid(orderItem)) {
+            return res.status(400).json({ message: "Invalid order item ID" });
+        }
+
+        // Find and update the order item from the database
+        const updatedOrderItem = await OrderItems.findByIdAndUpdate(orderItem, { qty }, { new: true });
+        
+        // Respond with a success message
+        if (updatedOrderItem) {
+            res.status(200).json({
+                success: true,
+                message: "Order item updated successfully",
+                data: updatedOrderItem,
+            });
+        } else {
+            res.status(404).json({ message: "Order item not found" });
+        }
+    } catch (error) {
+        // Handle errors
+        res.status(500).json({
+            success: false,
+            message: error.message,
+        });
+    }
+}
+
+export { addOrderItem, getOrderItem, getOrderItemByUserID, deleteOrderItem, updateOrderItem };

@@ -5,6 +5,8 @@ import {
     addOrderItem,
     getOrderItem,
     getOrderItemByUserID,
+    deleteOrderItem,
+    updateOrderItem,
 } from "../controllers/orderItemController.js";
 
 import { authenticate } from "../middlewares/authMiddleware.js";
@@ -24,7 +26,7 @@ import { authenticate } from "../middlewares/authMiddleware.js";
  *     summary: Add a new order item
  *     description: Creates a new order item based on the provided product ID and quantity.
  *     security:
- *       - bearerAuth: []
+ *       - bearerAuth: []  # Indicates that this endpoint requires bearer token authentication
  *     requestBody:
  *       required: true
  *       content:
@@ -33,9 +35,9 @@ import { authenticate } from "../middlewares/authMiddleware.js";
  *             type: object
  *             properties:
  *               user:
- *                type: string
- *               description: ID of the user
- *               example: "67127cb5f90d16421311e78b"  # Example user ID
+ *                 type: string
+ *                 description: ID of the user
+ *                 example: "67127cb5f90d16421311e78b"  # Example user ID
  *               product:
  *                 type: string
  *                 description: ID of the product to add
@@ -44,9 +46,10 @@ import { authenticate } from "../middlewares/authMiddleware.js";
  *                 type: integer
  *                 description: Quantity of the product
  *                 example: 2  # Example quantity
- *           example:  # Added this for your specific JSON example
- *             product: "67127cb5f90d16421311e78b" 
- *             qty: 2
+ *           example:  # Example request body
+ *             user: "671b1b011c1adb725fe5420d"
+ *             product: "671778e825d6cf6d6afe0703" 
+ *             qty: 1
  *     responses:
  *       201:
  *         description: Order item created successfully
@@ -78,14 +81,37 @@ import { authenticate } from "../middlewares/authMiddleware.js";
  *                       example: "http://example.com/image.jpg"
  *                     price:
  *                       type: number
+ *                       format: float  # Added format for clarity
  *                       example: 100.0
  *                     product:
  *                       type: string
  *                       example: "60f4f4f4f4f4f4f4f4f4f4"
  *       400:
  *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid input"
  *       404:
  *         description: Product not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Product not found"
  */
 
 /**
@@ -136,5 +162,61 @@ router
 router
     .route("/:id")
     .get(getOrderItemByUserID);
+
+/**
+ * @swagger
+ * /api/order-items/{id}:
+ *   delete:
+ *     tags: [OrderItems]
+ *     summary: Delete an order item
+ *     description: Deletes an order item by its ID
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the order item to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Order item deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Order item deleted successfully"
+ *       404:
+ *         description: Order item not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Order item not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */    
+router.route("/:id").delete(deleteOrderItem);    
+
+router.route("/:id").put(updateOrderItem);
 
 export default router;
