@@ -29,6 +29,15 @@ function calcPrices(orderItems) {
   };
 }
 
+// fix quantity product when create order
+function fixQuantityProduct(Product) {
+  Product.forEach(async (item) => {
+    const product = await Product.findById(item.id);
+    product.countInStock = product.countInStock - item.qty;
+    await product.save();
+  });
+};
+
 const createOrder = async (req, res) => {
   try {
     const { user, orderItems, shippingAddress, paymentMethod, paymentBill } = req.body;
@@ -60,7 +69,6 @@ const createOrder = async (req, res) => {
       return res.status(404).json({ message: "One or more products not found" });
     }
 
-    // Create OrderItems in the database and map the product references
     const orderItemsPromises = orderItems.map(async (productFromClient) => {
       const matchingProductFromDB = productsFromDB.find(
         (productFromDB) => productFromDB._id.toString() == productFromClient.id
@@ -70,11 +78,9 @@ const createOrder = async (req, res) => {
         throw new Error(`Product not found: ${itemFromClient.id}`);
       }
 
-      // Get order item base on user and product
       const orderItem = await OrderItems.findOne({ user: foundUser._id, product: matchingProductFromDB._id });
 
       if (orderItem) {
-        // Update the quantity of the existing order item
         orderItem.qty = productFromClient.qty;
       }
 
@@ -100,6 +106,8 @@ const createOrder = async (req, res) => {
     });
 
     const createdOrder = await order.save();
+
+    OrderItems.collection.drop();
 
     res.status(201).json(createdOrder);
   } catch (error) {
