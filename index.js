@@ -6,15 +6,15 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import swaggerDocs from "./swagger.js";
 // Utiles
-import connectDB from "./config/db.js";
-import userRoutes from "./routes/userRoutes.js";
-import categoryRoutes from "./routes/categoryRoutes.js";
-import productRoutes from "./routes/productRoutes.js";
-import uploadRoutes from "./routes/uploadRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import blogRoutes from "./routes/blogRoutes.js"; // Import blog routes
-import paymentBillRoutes from "./routes/paymentBillRoutes.js";
-import orderItemRoutes from "./routes/orderItemRoutes.js";
+import connectDB from "./backend/config/db.js";
+import userRoutes from "./backend/routes/userRoutes.js";
+import categoryRoutes from "./backend/routes/categoryRoutes.js";
+import productRoutes from "./backend/routes/productRoutes.js";
+import uploadRoutes from "./backend/routes/uploadRoutes.js";
+import orderRoutes from "./backend/routes/orderRoutes.js";
+import blogRoutes from "./backend/routes/blogRoutes.js"; // Import blog routes
+import paymentBillRoutes from "./backend/routes/paymentBillRoutes.js";
+import orderItemRoutes from "./backend/routes/orderItemRoutes.js";
 
 dotenv.config();
 const port = process.env.PORT || 10000;
