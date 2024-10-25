@@ -29,40 +29,26 @@ function calcPrices(orderItems) {
   };
 }
 
-// fix quantity product when create order
-function fixQuantityProduct(Product) {
-  Product.forEach(async (item) => {
-    const product = await Product.findById(item.id);
-    product.countInStock = product.countInStock - item.qty;
-    await product.save();
-  });
-};
-
 const createOrder = async (req, res) => {
   try {
     const { user, orderItems, shippingAddress, paymentMethod, paymentBill } = req.body;
 
-    // Check for empty order items
     if (!orderItems || orderItems.length === 0) {
       return res.status(400).json({ message: "No order items provided" });
     }
 
-    // Check if the paymentBill exists
     const foundPaymentBill = await PaymentBill.findById(paymentBill);
     if (!foundPaymentBill) {
       return res.status(404).json({ message: "Payment Bill not found" });
     }
 
-    // Fetch the user from the database
     const foundUser = await User.findById(user);
     if (!foundUser) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Fetch products from the database
     const productIds = orderItems.map(item => item.id);
     console.log(productIds);
-
     const productsFromDB = await Product.find({ _id: { $in: productIds } });
 
     if (productsFromDB.length !== productIds.length) {
@@ -92,9 +78,8 @@ const createOrder = async (req, res) => {
 
     const { itemsPrice, taxPrice, shippingPrice, totalPrice } = calcPrices(savedOrderItems);
 
-    // Create and save the order with user ID
     const order = new Order({
-      user: foundUser._id, // Store only the user ID here
+      user: foundUser._id, 
       paymentBill: foundPaymentBill._id,
       orderItems: savedOrderItems.map(item => item._id), // Store references to OrderItems
       shippingAddress,
@@ -106,6 +91,14 @@ const createOrder = async (req, res) => {
     });
 
     const createdOrder = await order.save();
+
+    await Promise.all(savedOrderItems.map(async (item) => {
+      const product = await Product.findById(item.product);
+      if (product) {
+        product.countInStock -= item.qty; // Decrease the stock by the quantity ordered
+        await product.save(); // Save the updated product
+      }
+    }));
 
     OrderItems.collection.drop();
 
@@ -158,7 +151,7 @@ const countTotalOrders = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}; // countDocuments method to count total orders
+};
 
 const calculateTotalSales = async (req, res) => {
   try {
@@ -168,7 +161,7 @@ const calculateTotalSales = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}; // reduce method to calculate total sales
+};
 
 const calcualteTotalSalesByDate = async (req, res) => {
   try {
@@ -192,7 +185,7 @@ const calcualteTotalSalesByDate = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}; // aggregate method to group orders by date and calculate total sales
+};
 
 const findOrderById = async (req, res) => {
   try {
@@ -200,8 +193,7 @@ const findOrderById = async (req, res) => {
       "user",
       "username email"
     );
-    // populate user field with username and email 
-
+  
     if (order) {
       res.json(order);
     } else {
@@ -213,7 +205,6 @@ const findOrderById = async (req, res) => {
   }
 };
 
-// markOrderAsPaid function to update order as paid
 const markOrderAsPaid = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -275,7 +266,6 @@ const getCartItems = async (req, res) => {
   }
 };
 
-
 export {
   createOrder,
   getAllOrders,
@@ -286,6 +276,5 @@ export {
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
-
   getCartItems
 };

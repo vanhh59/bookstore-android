@@ -16,10 +16,10 @@ const options = {
             version: '1.0.0',
         },
         servers: [
-            // {
-            //     url: "https://bookstore-api-nodejs.onrender.com",
-            //     description: "Live server"
-            // },
+            {
+                url: "https://bookstore-api-nodejs.onrender.com",
+                description: "Live server"
+            },
             {
                 url: "http://localhost:10000/",
                 description: "Local server"

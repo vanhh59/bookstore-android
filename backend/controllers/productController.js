@@ -76,27 +76,6 @@ const removeProduct = asyncHandler(async (req, res) => {
   }
 });
 
-// const fetchProducts = asyncHandler(async (req, res) => {
-//   try {
-//     const keyword = req.query.keyword ? req.query.keyword.trim() : '';
-//     const regexQuery = keyword
-//       ? {
-//         name: {
-//           $regex: keyword,
-//           $options: 'i',
-//         },
-//       }
-//       : {};
-//     console.log("Regex Query:", regexQuery);
-//     const products = await Product.find({ ...regexQuery }).populate('category');
-
-//     res.json(products);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Server Error' });
-//   }
-// });
-
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
     // Extract keyword and category from query parameters
