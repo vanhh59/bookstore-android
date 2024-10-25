@@ -32,6 +32,10 @@ import { authenticate } from "../middlewares/authMiddleware.js";
  *           schema:
  *             type: object
  *             properties:
+ *               user:
+ *                type: string
+ *               description: ID of the user
+ *               example: "67127cb5f90d16421311e78b"  # Example user ID
  *               product:
  *                 type: string
  *                 description: ID of the product to add

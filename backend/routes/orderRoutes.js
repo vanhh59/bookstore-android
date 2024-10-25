@@ -38,7 +38,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *                 items:
  *                   type: object
  *                   properties:
- *                     _id:
+ *                     id:
  *                       type: string
  *                       description: "Enter the product ID"
  *                     qty:
@@ -74,9 +74,9 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *             example:
  *               user: "671226027478771599feaedf"
  *               orderItems: 
- *                 - _id: "67127cb5f90d16421311e78b"
+ *                 - id: "67127cb5f90d16421311e78b"
  *                   qty: 2
- *                 - _id: "67147721c8d069352559be03"
+ *                 - id: "67147721c8d069352559be03"
  *                   qty: 1
  *               shippingAddress: 
  *                 name: "Viet Anh"
