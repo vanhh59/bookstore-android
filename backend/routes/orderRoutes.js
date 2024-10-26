@@ -32,7 +32,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *             properties:
  *               user:
  *                 type: string
- *                 description: "User ID"
+ *                 description: "User  ID"
  *               orderItems:
  *                 type: array
  *                 items:
@@ -72,15 +72,13 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *                 type: string
  *                 description: "ID of the payment bill"
  *             example:
- *               user: "671226027478771599feaedf"
+ *               user: "671b1b011c1adb725fe5420d"
  *               orderItems: 
- *                 - id: "67127cb5f90d16421311e78b"
- *                   qty: 2
- *                 - id: "67147721c8d069352559be03"
- *                   qty: 1
+ *                 - id: "671778e825d6cf6d6afe0703"
+ *                   qty: 5
  *               shippingAddress: 
  *                 name: "Viet Anh"
- *                 address: "120 La Xuan Oai Thu Duc"
+ *                 address: "123 Main Street"
  *                 city: "HCM"
  *                 postalCode: "70000"
  *                 country: "VN"
@@ -97,7 +95,6 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *       500:
  *         description: Internal server error
  */
-
 /**
  * @swagger
  * /api/orders:
