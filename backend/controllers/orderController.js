@@ -100,9 +100,8 @@ const createOrder = async (req, res) => {
       }
     }));
 
-   // OrderItems.collection.drop();
-
     res.status(201).json(createdOrder);
+    await OrderItems.deleteMany({});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

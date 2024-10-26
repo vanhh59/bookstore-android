@@ -49,7 +49,6 @@ const addOrderItem = async (req, res) => {
     }
 };
 
-
 const getOrderItem = async (req, res) => {
     try {
         // Fetch order items with specific fields and populated product details
