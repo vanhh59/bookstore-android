@@ -100,7 +100,7 @@ const createOrder = async (req, res) => {
       }
     }));
 
-    OrderItems.collection.drop();
+   // OrderItems.collection.drop();
 
     res.status(201).json(createdOrder);
   } catch (error) {

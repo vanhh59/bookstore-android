@@ -83,6 +83,8 @@ import {
  *       500:
  *         description: Internal server error
  */
+router
+  .route("/")
 /**
  * @swagger
  * /api/orders:
@@ -155,15 +157,66 @@ import {
  *     responses:
  *       201:
  *         description: Order created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 _id:
+ *                   type: string
+ *                   description: "The ID of the created order"
+ *                 user:
+ *                   type: string
+ *                   description: "User  ID associated with the order"
+ *                 paymentBill:
+ *                   type: string
+ *                   description: "Payment bill ID associated with the order"
+ *                 orderItems:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     description: "Array of order item IDs"
+ *                 shippingAddress:
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     address:
+ *                       type: string
+ *                     city:
+ *                       type: string
+ *                     postalCode:
+ *                       type: string
+ *                     country:
+ *                       type: string
+ *                     phoneNumber:
+ *                       type: string
+ *                 paymentMethod:
+ *                   type: string
+ *                   description: "Method of payment"
+ *                 itemsPrice:
+ *                   type: number
+ *                   format: float
+ *                   description: "Total price of items"
+ *                 taxPrice:
+ *                   type: number
+ *                   format: float
+ *                   description: "Total tax price"
+ *                 shippingPrice:
+ *                   type: number
+ *                   format: float
+ *                   description: "Total shipping price"
+ *                 totalPrice:
+ *                   type: number
+ *                   format: float
+ *                   description: "Total price of the order"
  *       400:
- *         description: Bad request, no order items
+ *         description: Bad request, no order items provided
  *       404:
- *         description: Product not found
+ *         description: Payment Bill or User not found, or one or more products not found
  *       500:
  *         description: Internal server error
- */
-router
-  .route("/")
+ */  
   .post(createOrder)
   .get(getAllOrders);
 
