@@ -11,11 +11,78 @@ import {
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
-  getCartItems,
 } from "../controllers/orderController.js";
-
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
-
+/**
+ * @swagger
+ * /api/orders:
+ *   get:
+ *     summary: Retrieve all orders
+ *     description: Fetch all orders from the system. Only admins can access this route.
+ *     tags: [Orders]
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved all orders
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   orderItems:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         product:
+ *                           type: string
+ *                         qty:
+ *                           type: integer
+ *                         price:
+ *                           type: number
+ *                   user:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       username:
+ *                         type: string
+ *                   shippingAddress:
+ *                     type: object
+ *                     properties:
+ *                       address:
+ *                         type: string
+ *                       city:
+ *                         type: string
+ *                       postalCode:
+ *                         type: string
+ *                       country:
+ *                         type: string
+ *                   paymentMethod:
+ *                     type: string
+ *                   itemsPrice:
+ *                     type: number
+ *                   taxPrice:
+ *                     type: number
+ *                   shippingPrice:
+ *                     type: number
+ *                   totalPrice:
+ *                     type: number
+ *                   isPaid:
+ *                     type: boolean
+ *                   paidAt:
+ *                     type: string
+ *                   isDelivered:
+ *                     type: boolean
+ *                   deliveredAt:
+ *                     type: string
+ *       401:
+ *         description: Unauthorized, admin access required
+ *       500:
+ *         description: Internal server error
+ */
 /**
  * @swagger
  * /api/orders:
@@ -95,78 +162,6 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *       500:
  *         description: Internal server error
  */
-/**
- * @swagger
- * /api/orders:
- *   get:
- *     summary: Retrieve all orders
- *     description: Fetch all orders from the system. Only admins can access this route.
- *     tags: [Orders]
- *     responses:
- *       200:
- *         description: Successfully retrieved all orders
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                   orderItems:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         product:
- *                           type: string
- *                         qty:
- *                           type: integer
- *                         price:
- *                           type: number
- *                   user:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       username:
- *                         type: string
- *                   shippingAddress:
- *                     type: object
- *                     properties:
- *                       address:
- *                         type: string
- *                       city:
- *                         type: string
- *                       postalCode:
- *                         type: string
- *                       country:
- *                         type: string
- *                   paymentMethod:
- *                     type: string
- *                   itemsPrice:
- *                     type: number
- *                   taxPrice:
- *                     type: number
- *                   shippingPrice:
- *                     type: number
- *                   totalPrice:
- *                     type: number
- *                   isPaid:
- *                     type: boolean
- *                   paidAt:
- *                     type: string
- *                   isDelivered:
- *                     type: boolean
- *                   deliveredAt:
- *                     type: string
- *       401:
- *         description: Unauthorized, admin access required
- *       500:
- *         description: Internal server error
- */
-
 router
   .route("/")
   .post(createOrder)
@@ -338,7 +333,7 @@ router.route("/total-sales-by-date").get(calcualteTotalSalesByDate);
  *       500:
  *         description: Internal server error
  */
-router.route("/:id").get(authenticate, findOrderById);
+router.route("/:id").get(findOrderById);
 
 /**
  * @swagger
@@ -380,7 +375,7 @@ router.route("/:id").get(authenticate, findOrderById);
  *       500:
  *         description: Internal server error
  */
-router.route("/:id/pay").put(authenticate, markOrderAsPaid);
+router.route("/:id/pay").put(markOrderAsPaid);
 
 /**
  * @swagger
@@ -406,13 +401,6 @@ router.route("/:id/pay").put(authenticate, markOrderAsPaid);
  */
 router
   .route("/:id/deliver")
-  .put(authenticate, markOrderAsDelivered);
-
-// Router get OrderItems
-router
-  .route("/cart-items")
-  .get(authenticate, getCartItems);
-
-
+  .put(markOrderAsDelivered);
 
 export default router;
