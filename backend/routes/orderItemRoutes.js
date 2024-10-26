@@ -217,6 +217,119 @@ router
  */    
 router.route("/:id").delete(deleteOrderItem);    
 
+/**
+ * @swagger
+ * /api/order-items/{id}:
+ *   put:
+ *     tags: [OrderItems]
+ *     summary: Update an order item
+ *     description: Updates an existing order item by its ID.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: The ID of the order item to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user:
+ *                 type: string
+ *                 description: ID of the user
+ *                 example: "67127cb5f90d16421311e78b"  # Example user ID
+ *               product:
+ *                 type: string
+ *                 description: ID of the product to update
+ *                 example: "6714707e7bf445c8a1c40d94"  # Example product ID
+ *               qty:
+ *                 type: integer
+ *                 description: Updated quantity of the product
+ *                 example: 3  # Example updated quantity
+ *           example:  # Example request body
+ *             user: "671b1b011c1adb725fe5420d"
+ *             product: "671778e825d6cf6d6afe0703" 
+ *             qty: 3
+ *     responses:
+ *       200:
+ *         description: Order item updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: "Order item updated successfully"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: "67127cb5f90d16421311e78b"
+ *                     name:
+ *                       type: string
+ *                       example: "Updated Product Name"
+ *                     qty:
+ *                       type: integer
+ *                       example: 3
+ *                     image:
+ *                       type: string
+ *                       example: "http://example.com/updated_image.jpg"
+ *                     price:
+ *                       type: number
+ *                       format: float  # Added format for clarity
+ *                       example: 120.0
+ *                     product:
+ *                       type: string
+ *                       example: "60f4f4f4f4f4f4f4f4f4f4"
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Invalid input"
+ *       404:
+ *         description: Order item not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Order item not found"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "Internal server error"
+ */
 router.route("/:id").put(updateOrderItem);
 
 export default router;
